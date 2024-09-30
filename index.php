@@ -1,3 +1,8 @@
+<?php
+    $valor = file_exists('output/data.txt') 
+    ? file('output/data.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)
+    : 'No hay datos';
+?>
 <head>
     <title>PHP Ajax Tailwind Test</title>
     <meta charset="utf-8">
@@ -68,59 +73,42 @@
         <button id="enviar" class="p-3 border rounded-md">Subir</button>
     </form>
 
+    <input id="escondido" name="escondido" value="">
     <div id="respuesta"></div>
-    <div id="resultado">
-        <label for="marca">Marca:</label>
-        <input type="text" id="marca_resultado" name="marcamarca_resultado" class="border rounded-md p-1">
-
-        <br>
-        
-        <label for="alto">Alto:</label>
-        <input type="text" id="alto_resultado" name="alto_resultado" class="border rounded-md p-1">
-        
-        <br>
-        
-        <label for="ancho">Ancho:</label>
-        <input type="text" id="ancho_resultado" name="ancho_resultado" class="border rounded-md p-1">
-        
-        <br>
-        
-        <label for="bluetooth">Conexión Bluetooth:</label>
-        <input type="text" id="bluetooth_resultado" name="bluetooth_resultado" class="border rounded-md p-1">
-
-        <br>
-
-        <label for="wifi">Conexión Wi-Fi:</label>
-        <input type="text" id="wifi_resultado" name="wifi_resultado" class="border rounded-md p-1">
-
-        
-        <br>
-        
-        <label for="garantia">Garantía:</label>
-        <input type="text" id="garantia_resultado" name="garantia_resultado" class="border rounded-md p-1">
-        
-        <br>
-        
-        <label for="hdmi">HDMI</label>
-        <input type="text" id="hdmi_resultado" name="hdmi_resultado" class="border rounded-md p-1">
-        
-        <br>
-        
-        <label for="hdmi">USB</label>
-        <input type="text" id="usb_resultado" name="usb_resultado" class="border rounded-md p-1">
-        
-        <br>
-        
-        <label for="pixeles_x">Píxeles (Ancho)</label>
-        <input type="text" id="pixeles_x_resultado" name="pixeles_x_resultado" class="border rounded-md p-1">
-        x
-        <label for="pixeles_y">Píxeles (Alto)</label>
-        <input type="text" id="pixeles_y_resultado" name="pixeles_y_resultado" class="border rounded-md p-1">
-        
-        <br>
-        
-        <label for="pulgadas">Pulgadas</label>
-        <input type="text" id="pulgadas_resultado" name="pulgadas_resultado" class="border rounded-md p-1">"
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Marca</th>
+                    <th>Alto</th>
+                    <th>Ancho</th>
+                    <th>Bluetooth</th>
+                    <th>Wi-Fi</th>
+                    <th>Garantía</th>
+                    <th>HDMI</th>
+                    <th>USB</th>
+                    <th>Píxeles (Ancho)</th>
+                    <th>Píxeles (Alto)</th>
+                    <th>Pulgadas</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if (is_array($valor)) {
+                    foreach ($valor as $linea) {
+                        echo "<tr>";
+                        $campos = explode(",", $linea);
+                        foreach ($campos as $campo) {
+                            echo "<td>" . htmlspecialchars($campo) . "</td>";
+                        }
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='11'>$valor</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
     </div>
 </body>
 <script>
@@ -136,17 +124,30 @@
                         var json = JSON.parse(response)
                         if(json.status === 'success'){
                             $('#respuesta').text(json.message)
-                            $('#marca_resultado').val(json.data.marca)
-                            $('#alto_resultado').val(json.data.alto)
-                            $('#ancho_resultado').val(json.data.ancho)
-                            $('#bluetooth_resultado').val(json.data.bluetooth)
-                            $('#wifi_resultado').val(json.data.wifi)
-                            $('#garantia_resultado').val(json.data.garantia)
-                            $('#hdmi_resultado').val(json.data.hdmi)
-                            $('#usb_resultado').val(json.data.usb)
-                            $('#pixeles_x_resultado').val(json.data.pixeles_x)
-                            $('#pixeles_y_resultado').val(json.data.pixeles_y)
-                            $('#pulgadas_resultado').val(json.data.pulgadas)
+
+                            $('tbody').empty()
+                            $.ajax({
+                                type:'GET',
+                                url: 'traer.php',
+                                success: function(response){
+                                    try {
+                                        var json = JSON.parse(response)
+                                        if(json.status === 'success'){
+                                            json.data.forEach(function(linea){
+                                                var campos = linea.split(',')
+                                                var nuevaFila = "<tr>"
+                                                campos.forEach(function(campo){
+                                                    nuevaFila += "<td>" + campo + "</td>"
+                                                })
+                                                nuevaFila += "</tr>"
+                                                $('tbody').append(nuevaFila)    
+                                            })
+                                        }
+                                    } catch (error) {
+                                        $('#respuesta').text('Error al actualizar la tabla. ', error)
+                                    }
+                                }
+                            })
                         }
                     } catch (error) {
                         console.log('Error al parsear a JSON: ', error);
@@ -156,5 +157,4 @@
             })
         })
     })
-
 </script>

@@ -23,7 +23,7 @@ if (isset($_POST['marca']) &&
     $pixeles_y = $_POST['pixeles_y'];
     $pulgadas = $_POST['pulgadas'];
 
-    $data = "$marca,$alto,$ancho,$bluetooth,$wifi,$garantia,$hdmi,$usb,$pixeles_x,$pixeles_y,$pulgadas\n";
+    $data = "$marca,$alto,$ancho,$bluetooth,$wifi,$garantia,$hdmi,$usb,$pixeles_x,$pixeles_y,$pulgadas." . PHP_EOL;
     
     if (file_put_contents('output/data.txt', $data, FILE_APPEND) === false) {
         echo json_encode([
@@ -34,32 +34,13 @@ if (isset($_POST['marca']) &&
     }
 
     $archivo = file('output/data.txt');
-    
-    if ($archivo === false) {
-        echo json_encode([
-            'status' => 'error', 
-            'message' => 'No se pudo leer el archivo'
-        ]);
-        exit;
-    }
 
     $ultimoRegistro = trim($archivo[count($archivo) - 1]);
+
     $devolver = explode(",", $ultimoRegistro);
 
     $response = [
-        'data' => [
-            'marca' => $devolver[0],
-            'alto' => $devolver[1],
-            'ancho' => $devolver[2],
-            'bluetooth' => $devolver[3],
-            'wifi' => $devolver[4],
-            'garantia' => $devolver[5],
-            'hdmi' => $devolver[6],
-            'usb' => $devolver[7],
-            'pixeles_x' => $devolver[8],
-            'pixeles_y' => $devolver[9],
-            'pulgadas' => $devolver[10]
-        ],
+        'data' => $devolver,
         'status' => 'success', 
         'message' => 'Datos guardados y recuperados correctamente'
     ];
