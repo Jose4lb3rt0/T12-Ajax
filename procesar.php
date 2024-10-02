@@ -2,8 +2,6 @@
 if (isset($_POST['marca']) && 
     isset($_POST['alto']) && 
     isset($_POST['ancho']) && 
-    isset($_POST['bluetooth']) && 
-    isset($_POST['wifi']) && 
     isset($_POST['garantia']) && 
     isset($_POST['hdmi']) && 
     isset($_POST['usb']) && 

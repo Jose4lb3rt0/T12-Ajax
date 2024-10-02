@@ -1,20 +1,28 @@
 <?php
 
-if (isset($_POST['index'])){
+if (isset($_POST['index'])) {
     $index = $_POST['index'];
 
-    $response = [
-        'data' => $index,
-        'status' => 'success', 
-        'message' => 'Datos eliminados correctamente'
-    ];
+    $archivo = file('output/data.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-    echo json_encode($response);
+    if (isset($archivo[$index])) {
+        unset($archivo[$index]);
+
+        file_put_contents('output/data.txt', implode(PHP_EOL, $archivo) . PHP_EOL);
+
+        echo json_encode([
+            'status' => 'success',
+            'message' => 'Elemento eliminado correctamente'
+        ]);
+    } else {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Índice no encontrado'
+        ]);
+    }
 } else {
-    $response = [
+    echo json_encode([
         'status' => 'error',
-        'message' => 'Algo falló!'
-    ];
-
-    echo json_encode($response);
+        'message' => 'No se proporcionó un índice válido'
+    ]);
 }
