@@ -117,16 +117,16 @@ $valor = file_exists('output/data.txt')
                                 echo "<td class='text-center p-2 text-white'>" . htmlspecialchars($campo) . "</td>";
                             }
                             echo "
-                                <td class='flex gap-2 items-center'>
-                                    <button id='editar-btn' class='bg-yellow-500 p-3 text-white rounded-md flex items-center hover:bg-yellow-700 transition-all duration-300' data-index='$index'>
-                                        <i class='fa-solid fa-pencil'></i>
-                                    </button>
-                                    <form id='form_eliminar_$index' class='flex justify-center items-center'>
-                                        <input type='hidden' name='index' value='$index'>
-                                        <button type='submit' class='bg-red-500 p-3 text-white rounded-md flex items-center hover:bg-red-700 transition-all duration-300'>
-                                            <i class='fa-solid fa-trash'></i>
+                                <td class='flex  items-center p-2 justify-center w-full inline-block'>
+                                        <button id='editar-btn' class='bg-yellow-500 p-3 text-white rounded-md flex items-center hover:bg-yellow-700 transition-all duration-300' data-index='$index'>
+                                            <i class='fa-solid fa-pencil'></i>
                                         </button>
-                                    </form>
+                                        <form id='form_eliminar_$index' class='flex items-center justify-center'>
+                                            <input type='hidden' name='index' value='$index'>
+                                            <button type='submit' class='bg-red-500 p-3 text-white rounded-md flex items-center hover:bg-red-700 transition-all duration-300'>
+                                                <i class='fa-solid fa-trash'></i>
+                                            </button>
+                                        </form>
                                 </td>
                             ";
                             echo "</tr>";
@@ -234,8 +234,10 @@ $(document).ready(function() {
                 try {
                     var json = JSON.parse(response)
                     if (json.status === 'success') {
+                    
                         $('tbody').empty()
                         console.log(json.data)
+
                         json.data.forEach(function(linea, index) {
                             var campos = linea.split(',')
                             var nuevaFila = "<tr class='bg-gray-700 hover:bg-gray-600 transition-all duration-300'>"
