@@ -117,8 +117,11 @@ $valor = file_exists('output/data.txt')
                                 echo "<td class='text-center p-2 text-white'>" . htmlspecialchars($campo) . "</td>";
                             }
                             echo "
-                                <td>
-                                    <form id='form_eliminar_$index' class='flex justify-center items-center p-2'>
+                                <td class='flex gap-2 items-center'>
+                                    <button id='editar-btn' class='bg-yellow-500 p-3 text-white rounded-md flex items-center hover:bg-yellow-700 transition-all duration-300' data-index='$index'>
+                                        <i class='fa-solid fa-pencil'></i>
+                                    </button>
+                                    <form id='form_eliminar_$index' class='flex justify-center items-center'>
                                         <input type='hidden' name='index' value='$index'>
                                         <button type='submit' class='bg-red-500 p-3 text-white rounded-md flex items-center hover:bg-red-700 transition-all duration-300'>
                                             <i class='fa-solid fa-trash'></i>
@@ -163,6 +166,65 @@ $(document).ready(function() {
         })
     })
 
+    $('body').on('click', '#editar-btn', function() {
+        var index = $(this).data('index')
+        $.ajax({
+            type: 'GET',
+            url: 'traer.php',
+            success: function(response) {
+                try {
+                    var json = JSON.parse(response)
+                    if (json.status === 'success') {
+                        var campos = json.data[index].split(',')
+                        $('#marca').val(campos[0])
+                        $('#alto').val(campos[1])
+                        $('#ancho').val(campos[2])
+                        $('#bluetooth').prop('checked', campos[3] === 'Sí')
+                        $('#wifi').prop('checked', campos[4] === 'Sí')
+                        $('#garantia').val(campos[5])
+                        $('#hdmi').val(campos[6])
+                        $('#usb').val(campos[7])
+                        $('#pixeles_x').val(campos[8])
+                        $('#pixeles_y').val(campos[9])
+                        $('#pulgadas').val(campos[10])
+
+                        $('#enviar').text('Guardar Cambios').attr('data-edit', index)
+                    }
+                } catch (error) {
+                    $('#respuesta').text('Error al cargar los datos para edición.')
+                }
+            }
+        })
+    })
+
+    $('#enviar').on('click', function(e) {
+        e.preventDefault()
+        var isEditing = $(this).attr('data-edit') !== undefined
+
+        if (isEditing) {
+            var index = $(this).attr('data-edit')
+
+            $.ajax({
+                type: 'POST',
+                url: 'editar.php',
+                data: $('#formulario').serialize() + '&index=' + index,
+                success: function(response) {
+                    try {
+                        var json = JSON.parse(response)
+                        if (json.status === 'success') {
+
+                            $('#respuesta').text(json.message)
+                            actualizar()
+                            $('#enviar').text('Subir').removeAttr('data-edit')
+
+                        }
+                    } catch (error) {
+                        $('#respuesta').text('Error al guardar los cambios.')
+                    }
+                }
+            })
+        }
+    })
     
     function actualizar() {
         $.ajax({
@@ -192,7 +254,7 @@ $(document).ready(function() {
                                 </td>`
                             nuevaFila += "</tr>"
                             $('tbody').append(nuevaFila)
-                        });
+                        })
                         agregarEventosEliminar()
                     }
                 } catch (error) {
@@ -213,14 +275,14 @@ $(document).ready(function() {
                 data: formData,
                 success: function(response) {
                     try {
-                        var json = JSON.parse(response);
+                        var json = JSON.parse(response)
                         if (json.status === 'success') {
 
-                            $('#respuesta').text(json.message);
+                            $('#respuesta').text(json.message)
                             actualizar()
 
                         } else {
-                            $('#respuesta').text(json.message);
+                            $('#respuesta').text(json.message)
                         }
                     } catch (error) {
                         $('#respuesta').text('Error al eliminar el elemento.')
@@ -233,7 +295,7 @@ $(document).ready(function() {
         }
     })
 
-    // actualizar();
+    // actualizar()
 })
     
 </script>
